@@ -1,0 +1,141 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    Products | S K Corporation
+{% endblock %}
+
+{% block content %}
+
+<!-- Page Hero -->
+<section class="page-hero">
+    <div class="hero-orb o1"></div>
+    <div class="hero-orb o2"></div>
+
+    <div class="container">
+        <div class="eyebrow reveal">
+            <span></span>
+            Product portfolio
+        </div>
+
+        <h1 class="page-title reveal delay-1">
+            Tools, tooling, fluids, MRO and sawing.
+        </h1>
+
+        <p class="page-lead reveal delay-2">
+            Browse the product and solution groups represented in the
+            supplied company profile.
+        </p>
+    </div>
+</section>
+
+<!-- Products Section -->
+<section class="section-pad pt-4">
+    <div class="container">
+
+        <!-- Category Filters -->
+        <div class="filter-wrap reveal">
+            <button
+                class="filter-btn active"
+                data-filter="all">
+                All
+            </button>
+
+            {% for category in categories %}
+                <button
+                    class="filter-btn"
+                    data-filter="{{ category|slugify }}">
+                    {{ category }}
+                </button>
+            {% endfor %}
+        </div>
+
+        <!-- Product Grid -->
+        
+        <div class="row g-4 mt-3" id="productGrid">
+
+            {% for product in products %}
+          
+                <div
+                    class="col-md-6 col-xl-4 product-item reveal"
+                    data-category="{{ product.category|slugify }}">
+                     <a href="{{product.url}}">
+                    <article class="catalog-card">
+
+                        <!-- Product Image -->
+                        <div
+                            class="catalog-top"
+                            style="--accent: {{ product.accent }}">
+
+                            {% if product.image %}
+                                <img
+                                    src="{{ product.image.url }}"
+                                    alt="{{ product.category }}">
+                            {% endif %}
+
+                            <span>
+                                {{ product.category }}
+                            </span>
+                        </div>
+
+                        <!-- Product Details -->
+                        <div class="p-4">
+
+                            <h3>
+                                {{ product.name }}
+                            </h3>
+
+                            <p>
+                                {{ product.description }}
+                            </p>
+
+                            <div class="application">
+                                <small>APPLICATIONS</small>
+
+                                <p>
+                                    {{ product.applications }}
+                                </p>
+                            </div>
+
+                            <a
+                                href="{% url 'home:contact' %}"
+                                class="btn btn-outline-dark btn-sm">
+
+                                Enquire
+
+                                <i class="bi bi-arrow-up-right"></i>
+                            </a>
+
+
+                        </div>
+
+                    </article>
+                      </a>
+                </div>
+               
+            {% empty %}
+
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        No products found. Run the seed command first.
+                    </div>
+                </div>
+
+            {% endfor %}
+
+        </div>
+    
+
+    </div>
+</section>
+
+{% endblock %}
+
+
+{% block extra_js %}
+
+<script src="{% static 'js/product-filter.js' %}"></script>
+
+{% endblock %}
+

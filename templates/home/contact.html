@@ -1,0 +1,789 @@
+
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    Contact | S K Corporation
+{% endblock %}
+
+{% block content %}
+
+<style>
+    /* ===============================
+       CUSTOM ENQUIRY FORM
+    ================================ */
+
+    .custom-field {
+        position: relative;
+    }
+
+    .custom-field label {
+        display: block;
+        margin-bottom: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #172033;
+    }
+
+    .required {
+        color: #dc3545;
+        margin-left: 3px;
+    }
+
+    .optional {
+        color: #8a94a6;
+        font-size: 12px;
+        font-weight: 400;
+        margin-left: 4px;
+    }
+
+    /* Input wrapper */
+
+    .input-wrapper {
+        position: relative;
+    }
+
+    .input-wrapper > i {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        z-index: 2;
+
+        transform: translateY(-50%);
+
+        color: #7b8494;
+        font-size: 17px;
+
+        pointer-events: none;
+    }
+
+    .input-wrapper .form-control {
+        min-height: 54px;
+        padding: 13px 16px 13px 46px;
+
+        border: 1px solid #dfe3e8;
+        border-radius: 12px;
+
+        background: #fff;
+        color: #172033;
+
+        font-size: 14px;
+
+        transition: all 0.25s ease;
+        box-shadow: none;
+    }
+
+    .input-wrapper .form-control::placeholder {
+        color: #a3aab5;
+    }
+
+    .input-wrapper .form-control:hover {
+        border-color: #b9c1cc;
+    }
+
+    .input-wrapper .form-control:focus {
+        border-color: #1d4ed8;
+        outline: none;
+
+        box-shadow: 0 0 0 4px rgba(29, 78, 216, 0.08);
+    }
+
+    /* Textarea */
+
+    .textarea-wrapper > i {
+        top: 20px;
+        transform: none;
+    }
+
+    .textarea-wrapper textarea {
+        min-height: 145px;
+        resize: vertical;
+    }
+
+    /* Error */
+
+    .field-error {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+
+        margin-top: 7px;
+
+        color: #dc3545;
+        font-size: 12px;
+    }
+
+    .field-error i {
+        font-size: 13px;
+    }
+
+    /* Character count */
+
+    .character-count {
+        margin-top: 5px;
+
+        text-align: right;
+
+        color: #8b94a3;
+        font-size: 11px;
+    }
+
+    /* Submit button */
+
+    .custom-submit-btn {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+
+        width: 30%;
+        min-height: 56px;
+
+        padding: 6px 7px 6px 22px;
+
+        border: 0;
+        border-radius: 12px;
+
+        background: #172033;
+        color: #fff;
+
+        font-size: 15px;
+        font-weight: 600;
+
+        cursor: pointer;
+
+        
+    }
+
+
+
+    .custom-submit-btn:active {
+        transform: translateY(0);
+    }
+
+    /* Arrow */
+
+    .btn-icon {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+
+        width: 44px;
+        height: 44px;
+
+        border-radius: 9px;
+
+        background: #fff;
+        color: #172033;
+
+        transition: transform 0.3s ease;
+    }
+
+    .custom-submit-btn:hover .btn-icon {
+        transform: translateX(3px);
+    }
+
+    /* Note */
+
+    .form-note {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+
+        color: #7b8494;
+        font-size: 12px;
+    }
+
+    .form-note i {
+        color: #198754;
+        font-size: 15px;
+    }
+
+    /* Mobile */
+
+    @media (max-width: 767px) {
+
+        .form-card {
+            padding: 22px !important;
+        }
+
+        .custom-submit-btn {
+            min-height: 54px;
+        }
+
+        .input-wrapper .form-control {
+            min-height: 52px;
+        }
+    }
+
+    /* =========================================
+   CONTACT PAGE VISIBILITY FIX
+========================================= */
+
+.contact-card,
+.form-card,
+.contact-card.reveal,
+.form-card.reveal,
+.col-lg-5.reveal,
+.col-lg-7.reveal {
+    opacity: 1 !important;
+    visibility: visible !important;
+    transform: none !important;
+}
+
+/* Make sure Bootstrap columns remain visible */
+.contact-card,
+.form-card {
+    display: block !important;
+}
+
+/* Contact card */
+.contact-card {
+    position: relative;
+    z-index: 2;
+}
+
+/* Form card */
+.form-card {
+    position: relative;
+    z-index: 2;
+}
+
+/* Mobile */
+@media (max-width: 991px) {
+    .contact-card,
+    .form-card {
+        width: 100%;
+    }
+}
+</style>
+
+
+<!-- =========================================
+     PAGE HERO
+========================================= -->
+
+<section class="page-hero">
+
+    <div class="hero-orb o1"></div>
+    <div class="hero-orb o2"></div>
+
+    <div class="container">
+
+        <div class="eyebrow reveal">
+            <span></span>
+            Contact
+        </div>
+
+        <h1 class="page-title reveal delay-1">
+            Tell us what you need.
+        </h1>
+
+        <p class="page-lead reveal delay-2">
+            Share the machining, tooling, fluids, maintenance or sawing
+            requirement and the team can coordinate the next step.
+        </p>
+
+    </div>
+</section>
+
+
+<!-- =========================================
+     CONTACT SECTION
+========================================= -->
+
+<section class="section-pad">
+
+    <div class="container">
+
+        <div class="row g-5">
+
+            <!-- =================================
+                 CONTACT INFORMATION
+            ================================== -->
+
+            <div class="col-lg-5 reveal">
+
+                <div class="contact-card">
+
+                    <div class="eyebrow">
+                        <span></span>
+                        Head office
+                    </div>
+
+                    <h2>
+                        Visit or connect
+                    </h2>
+
+                    <p>
+                        Flat No. 101, Sule Empire, Rau,<br>
+                        Dist. Indore, Madhya Pradesh - PIN 453331
+                    </p>
+
+
+                    <!-- Phone -->
+
+                    <a
+                        href="tel:9753803361"
+                        class="contact-item"
+                    >
+                        <i class="bi bi-telephone"></i>
+
+                        <span>
+                            <small>PHONE</small>
+                            9753803361
+                        </span>
+                    </a>
+
+
+                    <!-- Email -->
+
+                    <a
+                        href="mailto:skcorporation@gmail.com"
+                        class="contact-item"
+                    >
+                        <i class="bi bi-envelope"></i>
+
+                        <span>
+                            <small>EMAIL</small>
+                            skcorporation@gmail.com
+                        </span>
+                    </a>
+
+
+                    <div class="mini-note">
+                        Authorized distributor - cutting tools,
+                        tooling systems, industrial fluids and sawing technology.
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- =================================
+                 ENQUIRY FORM
+            ================================== -->
+
+            <div class="col-lg-7 reveal delay-1">
+
+                <div class="form-card">
+
+                    <!-- Form Header -->
+
+                    <div class="d-flex justify-content-between align-items-start gap-3 mb-4">
+
+                        <div>
+
+                            <div class="eyebrow">
+                                <span></span>
+                                Enquiry form
+                            </div>
+
+                            <h2>
+                                Start a conversation
+                            </h2>
+
+                            <p class="text-muted mb-0">
+                                Tell us what you need and our team will get back to you.
+                            </p>
+
+                        </div>
+
+                        <i class="bi bi-arrow-up-right arrow-corner"></i>
+
+                    </div>
+
+
+                    <!-- =================================
+                         FORM
+                    ================================== -->
+
+                    <form
+                        method="POST"
+                        action=""
+                        class="contact-form"
+                        id="customEnquiryForm"
+                        novalidate
+                    >
+
+                        {% csrf_token %}
+
+                        <div class="row g-4">
+
+
+                            <!-- Name -->
+
+                            <div class="col-md-6">
+
+                                <div class="custom-field">
+
+                                    <label for="id_name">
+                                        Your Name
+                                        <span class="required">*</span>
+                                    </label>
+
+                                    <div class="input-wrapper">
+
+                                        <i class="bi bi-person"></i>
+
+                                        <input
+                                            type="text"
+                                            id="id_name"
+                                            name="name"
+                                            class="form-control"
+                                            placeholder="Rahul Sharma"
+                                            value="{{ form.name.value|default:'' }}"
+                                            autocomplete="name"
+                                            required
+                                        >
+
+                                    </div>
+
+
+                                    {% if form.errors.name %}
+
+                                        <div class="field-error">
+
+                                            <i class="bi bi-exclamation-circle"></i>
+
+                                            {{ form.errors.name|striptags }}
+
+                                        </div>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Company -->
+
+                            <div class="col-md-6">
+
+                                <div class="custom-field">
+
+                                    <label for="id_company">
+                                        Company
+                                        <span class="optional">(Optional)</span>
+                                    </label>
+
+                                    <div class="input-wrapper">
+
+                                        <i class="bi bi-building"></i>
+
+                                        <input
+                                            type="text"
+                                            id="id_company"
+                                            name="company"
+                                            class="form-control"
+                                            placeholder="ABC Engineering Pvt. Ltd."
+                                            value="{{ form.company.value|default:'' }}"
+                                            autocomplete="organization"
+                                        >
+
+                                    </div>
+
+
+                                    {% if form.errors.company %}
+
+                                        <div class="field-error">
+
+                                            <i class="bi bi-exclamation-circle"></i>
+
+                                            {{ form.errors.company|striptags }}
+
+                                        </div>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Email -->
+
+                            <div class="col-md-6">
+
+                                <div class="custom-field">
+
+                                    <label for="id_email">
+                                        Email Address
+                                        <span class="required">*</span>
+                                    </label>
+
+                                    <div class="input-wrapper">
+
+                                        <i class="bi bi-envelope"></i>
+
+                                        <input
+                                            type="email"
+                                            id="id_email"
+                                            name="email"
+                                            class="form-control"
+                                            placeholder="rahul@example.com"
+                                            value="{{ form.email.value|default:'' }}"
+                                            autocomplete="email"
+                                            required
+                                        >
+
+                                    </div>
+
+
+                                    {% if form.errors.email %}
+
+                                        <div class="field-error">
+
+                                            <i class="bi bi-exclamation-circle"></i>
+
+                                            {{ form.errors.email|striptags }}
+
+                                        </div>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Phone -->
+
+                            <div class="col-md-6">
+
+                                <div class="custom-field">
+
+                                    <label for="id_phone">
+                                        Phone Number
+                                        <span class="optional">(Optional)</span>
+                                    </label>
+
+                                    <div class="input-wrapper">
+
+                                        <i class="bi bi-telephone"></i>
+
+                                        <input
+                                            type="tel"
+                                            id="id_phone"
+                                            name="phone"
+                                            class="form-control"
+                                            placeholder="9753803361"
+                                            value="{{ form.phone.value|default:'' }}"
+                                            autocomplete="tel"
+                                            inputmode="tel"
+                                        >
+
+                                    </div>
+
+
+                                    {% if form.errors.phone %}
+
+                                        <div class="field-error">
+
+                                            <i class="bi bi-exclamation-circle"></i>
+
+                                            {{ form.errors.phone|striptags }}
+
+                                        </div>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Subject -->
+
+                            <div class="col-12">
+
+                                <div class="custom-field">
+
+                                    <label for="id_subject">
+                                        Subject
+                                        <span class="optional">(Optional)</span>
+                                    </label>
+
+                                    <div class="input-wrapper">
+
+                                        <i class="bi bi-chat-left-text"></i>
+
+                                        <input
+                                            type="text"
+                                            id="id_subject"
+                                            name="subject"
+                                            class="form-control"
+                                            placeholder="Cutting tools requirement"
+                                            value="{{ form.subject.value|default:'' }}"
+                                        >
+
+                                    </div>
+
+
+                                    {% if form.errors.subject %}
+
+                                        <div class="field-error">
+
+                                            <i class="bi bi-exclamation-circle"></i>
+
+                                            {{ form.errors.subject|striptags }}
+
+                                        </div>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Message -->
+
+                            <div class="col-12">
+
+                                <div class="custom-field">
+
+                                    <label for="id_message">
+                                        Your Requirement
+                                        <span class="required">*</span>
+                                    </label>
+
+                                    <div class="input-wrapper textarea-wrapper">
+
+                                        <i class="bi bi-pencil-square"></i>
+
+                                        <textarea
+                                            id="id_message"
+                                            name="message"
+                                            class="form-control"
+                                            rows="5"
+                                            placeholder="Describe your requirement..."
+                                            required
+                                        >{{ form.message.value|default:'' }}</textarea>
+
+                                    </div>
+
+
+                                    <div class="character-count">
+                                        <span id="messageCount">0</span> / 1000
+                                    </div>
+
+
+                                    {% if form.errors.message %}
+
+                                        <div class="field-error">
+
+                                            <i class="bi bi-exclamation-circle"></i>
+
+                                            {{ form.errors.message|striptags }}
+
+                                        </div>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- Submit -->
+
+                            <div class="col-12 mt-2">
+
+                                <button
+                                    type="submit"
+                                    class="custom-submit-btn"
+                                    id="submitBtn"
+                                >
+
+                                    <span class="btn-text">
+                                        Send Enquiry
+                                    </span>
+
+                                    <span class="btn-icon">
+
+                                        <i class="bi bi-arrow-right"></i>
+
+                                    </span>
+
+                                </button>
+
+
+                               
+
+                            </div>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- =========================================
+     JAVASCRIPT
+========================================= -->
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+        const message = document.getElementById("id_message");
+        const counter = document.getElementById("messageCount");
+        const form = document.getElementById("customEnquiryForm");
+        const submitBtn = document.getElementById("submitBtn");
+
+
+        /* ===============================
+           CHARACTER COUNTER
+        ================================ */
+
+        if (message && counter) {
+
+            function updateCounter() {
+                counter.textContent = message.value.length;
+            }
+
+            message.addEventListener("input", updateCounter);
+
+            updateCounter();
+        }
+
+
+        /* ===============================
+           SUBMIT LOADING STATE
+        ================================ */
+
+        if (form && submitBtn) {
+
+            form.addEventListener("submit", function () {
+
+                if (!form.checkValidity()) {
+                    return;
+                }
+
+                submitBtn.disabled = true;
+
+                submitBtn.querySelector(".btn-text").textContent =
+                    "Sending Enquiry...";
+
+                submitBtn.querySelector(".btn-icon").innerHTML =
+                    '<i class="bi bi-arrow-repeat"></i>';
+
+            });
+
+        }
+
+    });
+</script>
+
+{% endblock %}
+

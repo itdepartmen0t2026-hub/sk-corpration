@@ -1,0 +1,1444 @@
+/* ==========================================================
+   S K Corporation — Motion layer (AI-studio grade animation)
+   ========================================================== */
+
+/* ---------- 0. Global ---------- */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+html {
+  scroll-behavior: auto;
+}
+
+/* ---------- 1. Preloader ---------- */
+#preloader {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #0b132e;
+  display: grid;
+  place-items: center;
+  color: #fff;
+}
+
+#preloader .pl-inner {
+  width: min(420px, 78vw);
+  text-align: center
+}
+
+#preloader .pl-logo {
+  height: 70px;
+  object-fit: contain;
+  background: #fff;
+  border-radius: 12px;
+  padding: .4rem 1rem;
+  margin-bottom: 1.6rem;
+  opacity: 0;
+  transform: translateY(14px)
+}
+
+#preloader .pl-track {
+  height: 2px;
+  background: rgba(255, 255, 255, .16);
+  border-radius: 99px;
+  overflow: hidden
+}
+
+#preloader .pl-bar {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #ef233c, #7e8ff5)
+}
+
+#preloader .pl-label {
+  margin-top: .9rem;
+  font: 700 .7rem/1 "Manrope", sans-serif;
+  letter-spacing: .28em;
+  color: #8f9cc4;
+  text-transform: uppercase
+}
+
+#preloader .pl-count {
+  float: right;
+  color: #fff
+}
+
+body.is-loading {
+  overflow: hidden
+}
+
+/* ---------- 2. Scroll progress + cursor ---------- */
+#scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  background: linear-gradient(90deg, #182650, #ef233c 55%, #7e8ff5);
+  z-index: 1080;
+  pointer-events: none;
+}
+
+#cursor-glow {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 420px;
+  height: 420px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
+  background: radial-gradient(circle, rgba(239, 35, 60, .13), rgba(126, 143, 245, .10) 42%, transparent 68%);
+  transform: translate3d(-50%, -50%, 0);
+  opacity: 0;
+  transition: opacity .4s ease;
+  mix-blend-mode: multiply;
+}
+
+body.cursor-live #cursor-glow {
+  opacity: 1
+}
+
+@media (max-width:991.98px) {
+  #cursor-glow {
+    display: none
+  }
+}
+
+/* ---------- 3. Hero canvas / neural field ---------- */
+.hero-section {
+  isolation: isolate
+}
+
+#hero-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  opacity: .85
+}
+
+.hero-section .container {
+  z-index: 2
+}
+
+.hero-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(46px);
+  z-index: 0;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.hero-orb.o1 {
+  width: 460px;
+  height: 460px;
+  background: rgba(239, 35, 60, .20);
+  right: -120px;
+  top: -140px
+}
+
+.hero-orb.o2 {
+  width: 380px;
+  height: 380px;
+  background: rgba(126, 143, 245, .24);
+  left: -130px;
+  bottom: -150px
+}
+
+.hero-orb.o3 {
+  width: 280px;
+  height: 280px;
+  background: rgba(24, 38, 80, .16);
+  right: 18%;
+  bottom: -120px
+}
+
+/* Text mask reveal */
+.line-mask {
+  display: block;
+  overflow: hidden
+}
+
+.line-mask>span {
+  display: block;
+  will-change: transform
+}
+
+.char {
+  display: inline-block;
+  will-change: transform, opacity
+}
+
+.word {
+  display: inline-block;
+  white-space: nowrap
+}
+
+/* Shimmering accent on hero highlight */
+.display-title span.grad {
+  background: linear-gradient(100deg, #ef233c 0%, #ff7182 30%, #7e8ff5 60%, #ef233c 100%);
+  background-size: 280% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: gradShift 7s linear infinite;
+}
+
+@keyframes gradShift {
+  to {
+    background-position: 280% 0
+  }
+}
+
+/* ---------- 4. Magnetic buttons + link underlines ---------- */
+.magnetic {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: .4rem;
+  will-change: transform
+}
+
+.magnetic>* {
+  pointer-events: none
+}
+
+.btn.magnetic {
+  overflow: hidden;
+  z-index: 0
+}
+
+.btn.magnetic::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, .30), transparent 62%);
+  opacity: 0;
+  transition: opacity .35s ease;
+}
+
+.btn.magnetic:hover::after {
+  opacity: 1
+}
+
+.nav-link {
+  position: relative
+}
+
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: .85rem;
+  right: .85rem;
+  bottom: .38rem;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--red);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform .45s cubic-bezier(.16, 1, .3, 1);
+}
+
+.nav-link:hover::after,
+.nav-link.active::after {
+  transform: scaleX(1)
+}
+
+/* ---------- 5. Nav scroll state ---------- */
+.site-nav {
+  transition: padding .4s ease, background .4s ease, box-shadow .4s ease
+}
+
+.site-nav.nav-shrunk {
+  padding: .15rem 0;
+  background: rgba(255, 255, 255, .82);
+  box-shadow: 0 10px 40px rgba(9, 19, 44, .10)
+}
+
+.site-nav.nav-shrunk .brand-mark {
+  height: 50px;
+  transition: height .4s ease
+}
+
+/* ---------- 6. Cards: 3D tilt + spotlight ---------- */
+.tilt {
+  transform-style: preserve-3d;
+  will-change: transform;
+  transition: transform .45s cubic-bezier(.16, 1, .3, 1), box-shadow .45s ease
+}
+
+.tilt>* {
+  transform: translateZ(24px)
+}
+
+.spotlight {
+  position: relative;
+  overflow: hidden
+}
+
+.spotlight::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .4s ease;
+  background: radial-gradient(340px circle at var(--mx, 50%) var(--my, 50%), rgba(126, 143, 245, .16), transparent 65%);
+}
+
+.spotlight:hover::before {
+  opacity: 1
+}
+
+.product-card.spotlight::before {
+  background: radial-gradient(340px circle at var(--mx, 50%) var(--my, 50%), rgba(255, 255, 255, .14), transparent 62%)
+}
+
+/* Animated border sweep on capability cards */
+.capability-card.sweep::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 3px;
+  width: 100%;
+  background: linear-gradient(90deg, var(--red), #7e8ff5);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  transition: transform .55s cubic-bezier(.16, 1, .3, 1);
+}
+
+.capability-card.sweep:hover::after {
+  transform: scaleX(1)
+}
+
+/* ---------- 7. Counters ---------- */
+.hero-metrics strong {
+  font-variant-numeric: tabular-nums
+}
+
+/* ---------- 8. Marquee ---------- */
+.marquee {
+  overflow: hidden;
+  position: relative;
+  padding: 1.15rem 0;
+  border-top: 1px solid rgba(255, 255, 255, .10);
+  border-bottom: 1px solid rgba(255, 255, 255, .10);
+  background: #0e1838;
+  mask-image: linear-gradient(90deg, transparent, #000 8%, #000 92%, transparent);
+}
+
+.marquee-track {
+  display: flex;
+  gap: 3.2rem;
+  width: max-content;
+  will-change: transform
+}
+
+.marquee-track span {
+  font: 800 clamp(1rem, 1.9vw, 1.55rem)/1 "Manrope", sans-serif;
+  letter-spacing: -.02em;
+  color: #e8ecf9;
+  display: flex;
+  align-items: center;
+  gap: 3.2rem;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.marquee-track i {
+  color: var(--red);
+  font-size: .7em
+}
+
+/* ---------- 9. Parallax media ---------- */
+.parallax-media {
+  overflow: hidden
+}
+
+.parallax-media img {
+  will-change: transform;
+  transform: scale(1.14)
+}
+
+/* ---------- 10. Reveal (GSAP-driven, JS-gated) ---------- */
+html.gsap-ready .reveal {
+  opacity: 0;
+  transform: none;
+  transition: none
+}
+
+html.gsap-ready .reveal.in-view {
+  opacity: 1
+}
+
+.stagger-child {
+  will-change: transform, opacity
+}
+
+/* ---------- 11. Page transition curtain ---------- */
+#page-curtain {
+  position: fixed;
+  inset: 0;
+  z-index: 9500;
+  background: #0b132e;
+  pointer-events: none;
+  transform: translateY(100%);
+}
+
+#page-curtain .pc-mark {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  height: 56px;
+  opacity: .9;
+  background: #fff;
+  border-radius: 10px;
+  padding: .3rem .8rem
+}
+
+/* ---------- 12. Form + misc micro-interactions ---------- */
+.form-control {
+  transition: border-color .3s ease, box-shadow .3s ease, transform .3s ease
+}
+
+.form-control:focus {
+  transform: translateY(-2px)
+}
+
+.circle-link {
+  transition: transform .4s cubic-bezier(.16, 1, .3, 1), background .3s ease, color .3s ease
+}
+
+.circle-link:hover {
+  transform: translateX(6px) rotate(-8deg)
+}
+
+.partner-tile {
+  will-change: transform
+}
+
+.filter-btn {
+  transition: transform .3s ease, background .3s ease, color .3s ease, border-color .3s ease
+}
+
+.filter-btn:active {
+  transform: scale(.95)
+}
+
+/* Scroll hint */
+.scroll-hint {
+  position: absolute;
+  left: 50%;
+  bottom: 1.8rem;
+  transform: translateX(-50%);
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .5rem;
+  font: 700 .64rem/1 "Manrope", sans-serif;
+  letter-spacing: .26em;
+  color: #7b87a4;
+  text-transform: uppercase;
+}
+
+.scroll-hint .sh-line {
+  width: 1px;
+  height: 52px;
+  background: linear-gradient(#c3cad9, transparent);
+  position: relative;
+  overflow: hidden
+}
+
+.scroll-hint .sh-line::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--red);
+  animation: shRun 2.1s cubic-bezier(.6, 0, .3, 1) infinite
+}
+
+@keyframes shRun {
+  0% {
+    transform: translateY(-100%)
+  }
+
+  60%,
+  100% {
+    transform: translateY(100%)
+  }
+}
+
+@media (max-width:991.98px) {
+  .scroll-hint {
+    display: none
+  }
+}
+
+/* ---------- 13. Reduced motion ---------- */
+@media (prefers-reduced-motion:reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important
+  }
+
+  #preloader {
+    display: none
+  }
+
+  .reveal,
+  html.gsap-ready .reveal {
+    opacity: 1 !important;
+    transform: none !important
+  }
+
+  #hero-canvas,
+  #cursor-glow {
+    display: none
+  }
+}
+
+/* page-hero decoration containment */
+.page-hero {
+  position: relative;
+  overflow: hidden;
+  isolation: isolate
+}
+
+.page-hero .container {
+  position: relative;
+  z-index: 2
+}
+
+.page-hero .hero-orb.o1 {
+  width: 380px;
+  height: 380px;
+  top: -160px;
+  right: -110px
+}
+
+.page-hero .hero-orb.o2 {
+  width: 300px;
+  height: 300px;
+  bottom: -160px;
+  left: -120px
+}
+
+/* keep split-line wrappers neutral (site.css colors bare spans red) */
+.display-title .line-mask,
+.display-title .line-mask>span,
+.page-title .line-mask,
+.page-title .line-mask>span {
+  color: inherit
+}
+
+.display-title .line-mask>span>.grad {
+  display: inline-block
+}
+
+@media (max-width:767.98px) {
+  .hero-orb {
+    filter: blur(60px);
+    opacity: .55
+  }
+
+  .hero-orb.o1 {
+    width: 300px;
+    height: 300px;
+    right: -110px;
+    top: -90px
+  }
+
+  .hero-orb.o3 {
+    display: none
+  }
+}
+
+/* ==========================================================
+   Hero visual — modern image panel with floating info card
+   ========================================================== */
+.hero-visual {
+  position: relative;
+  margin: 0;
+  z-index: 2
+}
+
+.hv-media {
+  position: relative;
+  border-radius: 30px;
+  overflow: hidden;
+  box-shadow: 0 40px 90px rgba(11, 19, 46, .30), 0 2px 0 rgba(255, 255, 255, .6) inset;
+  aspect-ratio: 4/4.6;
+  background: #0b132e;
+}
+
+.hv-media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transform: scale(1.06);
+  will-change: transform
+}
+
+.hv-media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(11, 19, 46, .28) 0%, transparent 32%, rgba(11, 19, 46, .55) 100%);
+}
+
+.hv-shine {
+  position: absolute;
+  top: -60%;
+  left: -40%;
+  width: 45%;
+  height: 220%;
+  pointer-events: none;
+  z-index: 2;
+  background: linear-gradient(100deg, transparent, rgba(255, 255, 255, .24), transparent);
+  transform: rotate(14deg);
+  animation: hvShine 6.5s ease-in-out 1.6s infinite;
+}
+
+@keyframes hvShine {
+  0% {
+    left: -45%
+  }
+
+  55%,
+  100% {
+    left: 125%
+  }
+}
+
+.hv-badge {
+  position: absolute;
+  top: 1.1rem;
+  left: 1.1rem;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: .45rem;
+  background: rgba(11, 19, 46, .55);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, .22);
+  color: #fff;
+  font: 800 .68rem/1 "Manrope", sans-serif;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  padding: .55rem .8rem;
+  border-radius: 999px;
+}
+
+.hv-badge i {
+  color: #ff7182;
+  animation: hvPulse 1.9s ease-in-out infinite
+}
+
+@keyframes hvPulse {
+
+  0%,
+  100% {
+    opacity: 1
+  }
+
+  50% {
+    opacity: .35
+  }
+}
+
+.hv-card {
+  position: relative;
+  margin: -3.6rem 1.1rem 0;
+  z-index: 4;
+  background: rgba(255, 255, 255, .90);
+  backdrop-filter: blur(16px) saturate(140%);
+  border: 1px solid rgba(255, 255, 255, .75);
+  border-radius: 22px;
+  padding: 1rem 1.15rem 1.15rem;
+  box-shadow: 0 26px 60px rgba(11, 19, 46, .20);
+}
+
+.hv-card-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font: 800 .68rem/1 "Manrope", sans-serif;
+  letter-spacing: .16em;
+  color: #7a86a0
+}
+
+.hv-card-top i {
+  color: var(--red)
+}
+
+.hv-card-body {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-top: .85rem
+}
+
+.hv-logo {
+  width: 96px;
+  height: 52px;
+  object-fit: contain;
+  flex: 0 0 auto
+}
+
+.hv-address {
+  margin: 0;
+  font-size: .86rem;
+  color: #4d5a75;
+  font-weight: 600;
+  line-height: 1.45
+}
+
+.hv-contact {
+  margin: .35rem 0 0;
+  font-size: .8rem;
+  color: #5d6880;
+  font-weight: 600
+}
+
+.hv-contact i {
+  color: var(--red);
+  margin-right: .2rem
+}
+
+.hv-contact span {
+  color: #c3c9d6;
+  margin: 0 .25rem
+}
+
+@media (max-width:991.98px) {
+  .hero-visual {
+    max-width: 560px;
+    margin: 0 auto
+  }
+
+  .hv-media {
+    aspect-ratio: 4/3.4
+  }
+}
+
+@media (max-width:575.98px) {
+  .hv-card-body {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: .7rem
+  }
+
+  .hv-card {
+    margin: -2.6rem .7rem 0
+  }
+}
+
+.hv-media {
+  transition: box-shadow .5s ease, transform .6s cubic-bezier(.16, 1, .3, 1)
+}
+
+.hero-visual:hover .hv-media {
+  transform: translateY(-6px);
+  box-shadow: 0 50px 110px rgba(11, 19, 46, .36)
+}
+
+@media (min-width:992px) {
+  .hero-section {
+    padding: 5rem 0 5.5rem;
+    min-height: 0
+  }
+
+  .hv-media {
+    aspect-ratio: 4/4.1
+  }
+}
+
+.portfolio-slider-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  margin-top: 2rem;
+}
+
+.portfolio-slider {
+  width: 100%;
+  overflow: hidden;
+}
+
+.portfolio-track {
+  display: flex;
+  gap: 1.5rem;
+  transition: transform 0.55s ease;
+  will-change: transform;
+}
+
+.portfolio-card {
+  flex: 0 0 calc((100% - 3rem) / 3);
+  min-width: 0;
+  position: relative;
+}
+
+.portfolio-arrow {
+  width: 46px;
+  height: 46px;
+  flex: 0 0 46px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 50%;
+  background: #fff;
+  color: #111b3c;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  z-index: 2;
+}
+
+.portfolio-arrow:hover {
+  background: #e92d4d;
+  border-color: #e92d4d;
+  color: #fff;
+  transform: scale(1.06);
+}
+
+.portfolio-arrow:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.portfolio-dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 1.75rem;
+}
+
+.portfolio-dot {
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.35);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.portfolio-dot.active {
+  width: 26px;
+  border-radius: 10px;
+  background: #e92d4d;
+}
+
+@media (max-width: 1199px) {
+  .portfolio-card {
+    flex-basis: calc((100% - 1.5rem) / 2);
+  }
+}
+
+@media (max-width: 767px) {
+  .portfolio-slider-wrapper {
+    gap: 8px;
+  }
+
+  .portfolio-card {
+    flex-basis: 100%;
+  }
+
+  .portfolio-arrow {
+    width: 38px;
+    height: 38px;
+    flex-basis: 38px;
+  }
+
+  .portfolio-card .product-logo {
+    min-height: 130px;
+  }
+}
+
+
+/* Right-side partner product slider */
+.partner-product-slider {
+  position: relative;
+  padding-bottom: 32px;
+}
+
+.partner-product-slider .carousel-inner {
+  overflow: hidden;
+  border-radius: 24px;
+}
+
+/* Main card */
+.partner-product-card {
+  position: relative;
+  min-height: 510px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 24px;
+  background:
+    radial-gradient(circle at 100% 0%, rgba(78, 111, 223, 0.30), transparent 38%),
+    linear-gradient(145deg, #223564, #101b3c);
+  box-shadow: 0 25px 55px rgba(0, 0, 0, 0.28);
+}
+
+/* Image box */
+.partner-product-image {
+  position: relative;
+  height: 305px;
+  overflow: hidden;
+  background: #f8f9fb;
+}
+
+.partner-product-image img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  transition: transform 0.7s ease;
+}
+
+.partner-product-card:hover .partner-product-image img {
+  transform: scale(1.07);
+}
+
+/* Light effect over image */
+.partner-image-shine {
+  position: absolute;
+  top: 0;
+  left: -80%;
+  width: 42%;
+  height: 100%;
+  transform: skewX(-22deg);
+  background: rgba(255, 255, 255, 0.38);
+  animation: partnerImageShine 4.7s ease-in-out infinite;
+}
+
+@keyframes partnerImageShine {
+
+  0%,
+  32% {
+    left: -80%;
+  }
+
+  67%,
+  100% {
+    left: 138%;
+  }
+}
+
+/* Text area */
+.partner-product-info {
+  padding: 23px 28px 28px;
+  color: #ffffff;
+}
+
+.partner-tag {
+  display: block;
+  margin-bottom: 9px;
+  color: #aebce0;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+}
+
+.partner-product-info h3 {
+  margin: 0 0 10px;
+  color: #ffffff;
+  font-size: clamp(1.5rem, 2vw, 2rem);
+  font-weight: 700;
+}
+
+.partner-product-info p {
+  margin: 0;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.95rem;
+  line-height: 1.65;
+}
+
+/* Arrow buttons */
+.partner-product-slider .carousel-control-prev,
+.partner-product-slider .carousel-control-next {
+  top: 47%;
+  width: auto;
+  opacity: 1;
+}
+
+.partner-product-slider .carousel-control-prev {
+  left: -16px;
+}
+
+.partner-product-slider .carousel-control-next {
+  right: -16px;
+}
+
+.partner-slider-arrow {
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: #122148;
+  background: #ffffff;
+  box-shadow: 0 9px 24px rgba(0, 0, 0, 0.22);
+  font-size: 1.15rem;
+  transition: all 0.25s ease;
+}
+
+.partner-slider-arrow:hover {
+  color: #ffffff;
+  background: #e83052;
+  transform: scale(1.08);
+}
+
+/* Slider dots */
+.partner-product-slider .carousel-indicators {
+  bottom: -2px;
+  margin: 0;
+}
+
+.partner-product-slider .carousel-indicators button {
+  width: 18px;
+  height: 4px;
+  margin: 0 3px;
+  padding: 0;
+  border: 0;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.36);
+}
+
+.partner-product-slider .carousel-indicators button.active {
+  width: 28px;
+  background: #f23858;
+}
+
+/* Responsive */
+@media (max-width: 991.98px) {
+  .partner-product-slider {
+    max-width: 550px;
+    margin: 0 auto;
+  }
+
+  .partner-product-card {
+    min-height: auto;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .partner-product-image {
+    height: 235px;
+  }
+
+  .partner-product-info {
+    padding: 21px;
+  }
+
+  .partner-product-slider .carousel-control-prev {
+    left: -8px;
+  }
+
+  .partner-product-slider .carousel-control-next {
+    right: -8px;
+  }
+
+  .partner-slider-arrow {
+    width: 38px;
+    height: 38px;
+  }
+}
+
+/* =========================================================
+   PREMIUM PARTNER PRODUCT HERO CAROUSEL
+   ========================================================= */
+
+.partner-product-slider {
+  position: relative;
+  isolation: isolate;
+  padding: 10px 12px 44px;
+}
+
+/* Outer glow behind the card */
+.partner-product-slider::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  width: 74%;
+  height: 72%;
+  top: 10%;
+  right: -8%;
+  border-radius: 50%;
+  background: rgba(73, 107, 225, 0.36);
+  filter: blur(65px);
+  animation: partnerGlowFloat 7s ease-in-out infinite alternate;
+}
+
+@keyframes partnerGlowFloat {
+  from {
+    transform: translate3d(-10px, -8px, 0) scale(0.93);
+    opacity: 0.48;
+  }
+
+  to {
+    transform: translate3d(25px, 18px, 0) scale(1.12);
+    opacity: 0.86;
+  }
+}
+
+/* Carousel viewport */
+.partner-product-slider .carousel-inner {
+  overflow: hidden;
+  border-radius: 26px;
+  box-shadow: 0 30px 65px rgba(0, 0, 0, 0.34);
+}
+
+/* Smooth right-to-left / left-to-right movement */
+.partner-product-slider .carousel-item {
+  transition: transform 0.95s cubic-bezier(0.22, 0.8, 0.2, 1);
+}
+
+/* Product card */
+.partner-product-card {
+  position: relative;
+  min-height: 510px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 26px;
+  background:
+    radial-gradient(circle at 92% 0%, rgba(80, 129, 255, 0.32), transparent 42%),
+    linear-gradient(145deg, #26396e 0%, #101934 58%, #0a112a 100%);
+}
+
+/* Pattern layer */
+.partner-product-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  opacity: 0.24;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.09) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.09) 1px, transparent 1px);
+  background-size: 34px 34px;
+  mask-image: linear-gradient(to bottom, #000, transparent 74%);
+}
+
+/* Image panel */
+.partner-product-image {
+  position: relative;
+  z-index: 1;
+  height: 300px;
+  overflow: hidden;
+  background:
+    linear-gradient(135deg, rgba(255, 255, 255, 0.98), rgba(229, 235, 250, 0.96));
+}
+
+/* Product image */
+.partner-product-image img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  padding: 26px;
+  object-fit: contain;
+  filter: drop-shadow(0 20px 16px rgba(22, 35, 72, 0.22));
+  transform: scale(1.05) translate3d(0, 18px, 0);
+  transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Soft image gradient */
+.partner-product-image::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.10) 0%, transparent 48%, rgba(8, 17, 43, 0.17) 100%);
+}
+
+/* Slide entry image motion */
+.partner-product-slider .carousel-item.active .partner-product-image img {
+  animation: partnerImageEnter 1.2s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes partnerImageEnter {
+  0% {
+    opacity: 0;
+    transform: scale(1.23) translate3d(32px, 25px, 0);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1.05) translate3d(0, 0, 0);
+  }
+}
+
+/* Image hover movement */
+.partner-product-card:hover .partner-product-image img {
+  transform: scale(1.12) translate3d(0, -6px, 0);
+}
+
+/* Animated shine */
+.partner-image-shine {
+  position: absolute;
+  z-index: 3;
+  top: -15%;
+  left: -95%;
+  width: 55%;
+  height: 130%;
+  transform: rotate(19deg);
+  pointer-events: none;
+  background: linear-gradient(90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.04) 26%,
+      rgba(255, 255, 255, 0.72) 48%,
+      rgba(255, 255, 255, 0.08) 72%,
+      transparent 100%);
+}
+
+/* Shine runs only on active slide */
+.partner-product-slider .carousel-item.active .partner-image-shine {
+  animation: partnerImageShine 1.25s 0.35s ease-out both;
+}
+
+@keyframes partnerImageShine {
+  from {
+    left: -95%;
+    opacity: 0;
+  }
+
+  18% {
+    opacity: 1;
+  }
+
+  to {
+    left: 140%;
+    opacity: 0;
+  }
+}
+
+/* Product details */
+.partner-product-info {
+  position: relative;
+  z-index: 1;
+  padding: 27px 30px 32px;
+  color: #ffffff;
+}
+
+/* Brand/tag enters first */
+.partner-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+  color: #c9d6ff;
+  font-size: 0.69rem;
+  font-weight: 800;
+  letter-spacing: 0.16em;
+  opacity: 0;
+  transform: translateY(16px);
+}
+
+.partner-tag::before {
+  content: "";
+  width: 24px;
+  height: 2px;
+  border-radius: 4px;
+  background: #f23559;
+}
+
+/* Main title */
+.partner-product-info h3 {
+  margin: 0 0 10px;
+  color: #ffffff;
+  font-size: clamp(1.55rem, 2.1vw, 2.05rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+/* Description */
+.partner-product-info p {
+  max-width: 390px;
+  margin: 0;
+  color: rgba(232, 238, 255, 0.76);
+  font-size: 0.96rem;
+  line-height: 1.7;
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+/* Staggered text reveal on each active slide */
+.partner-product-slider .carousel-item.active .partner-tag {
+  animation: partnerTextEnter 0.62s 0.42s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.partner-product-slider .carousel-item.active .partner-product-info h3 {
+  animation: partnerTextEnter 0.68s 0.54s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.partner-product-slider .carousel-item.active .partner-product-info p {
+  animation: partnerTextEnter 0.72s 0.66s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes partnerTextEnter {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Premium circular nav controls */
+.partner-product-slider .carousel-control-prev,
+.partner-product-slider .carousel-control-next {
+  z-index: 5;
+  top: 45%;
+  width: auto;
+  opacity: 1;
+  transition: transform 0.25s ease;
+}
+
+.partner-product-slider .carousel-control-prev {
+  left: -11px;
+}
+
+.partner-product-slider .carousel-control-next {
+  right: -11px;
+}
+
+.partner-slider-arrow {
+  width: 46px;
+  height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 50%;
+  color: #15234b;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 13px 30px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(10px);
+  font-size: 1.15rem;
+  transition: all 0.25s ease;
+}
+
+.partner-product-slider .carousel-control-prev:hover .partner-slider-arrow,
+.partner-product-slider .carousel-control-next:hover .partner-slider-arrow {
+  color: #ffffff;
+  border-color: #f03558;
+  background: #f03558;
+  transform: scale(1.1);
+}
+
+/* Premium dot indicators */
+.partner-product-slider .carousel-indicators {
+  bottom: -1px;
+  align-items: center;
+  margin: 0;
+}
+
+.partner-product-slider .carousel-indicators button {
+  width: 7px;
+  height: 7px;
+  margin: 0 4px;
+  padding: 0;
+  border: 0;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.42);
+  opacity: 1;
+  transition: width 0.35s ease, background 0.35s ease, transform 0.35s ease;
+}
+
+.partner-product-slider .carousel-indicators button.active {
+  width: 30px;
+  background: #f1395a;
+  transform: scale(1.05);
+}
+
+/* Responsive layout */
+@media (max-width: 991.98px) {
+  .partner-product-slider {
+    max-width: 540px;
+    margin: 0 auto;
+  }
+
+  .partner-product-card {
+    min-height: auto;
+  }
+}
+
+@media (max-width: 575.98px) {
+  .partner-product-slider {
+    padding: 6px 8px 40px;
+  }
+
+  .partner-product-image {
+    height: 230px;
+  }
+
+  .partner-product-image img {
+    padding: 18px;
+  }
+
+  .partner-product-info {
+    padding: 22px;
+  }
+
+  .partner-product-slider .carousel-control-prev {
+    left: -5px;
+  }
+
+  .partner-product-slider .carousel-control-next {
+    right: -5px;
+  }
+
+  .partner-slider-arrow {
+    width: 40px;
+    height: 40px;
+  }
+}
+
+/* Users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+
+  .partner-product-slider *,
+  .partner-product-slider *::before,
+  .partner-product-slider *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
